@@ -12,10 +12,26 @@ echo "-----> Running sidecar supply"
 
 echo '---
 processes:
-- type: "sidecar_process"
-  command: "while true; do echo hello from a sidecar; sleep 10; done"
-  limits:
-    memory: 100
+- type: issue-token
+    command: |
+    if [ -z "$CITS_URL" ]; then
+      echo "Error: CITS_URL is not set" >&2
+      exit 1
+    fi
+    TOKEN_FILE="${AWS_WEB_IDENTITY_TOKEN_FILE:-${SPRING_CLOUD_AWS_CREDENTIALS_STS_WEBIDENTITYTOKENFILE:-${spring_cloud_aws_credentials_sts_web_identity_token_file:-/tmp/token}}}"
+    echo "CITS_URL: ${CITS_URL}"
+    echo "TOKEN_FILE: ${TOKEN_FILE}"
+    while true;do
+      set +e
+      curl -s -XPOST ${CITS_URL}/token \
+        --key ${CF_INSTANCE_KEY} \
+        --cert ${CF_INSTANCE_CERT} \
+        -o ${TOKEN_FILE} \
+        -w "status:%{http_code}\n"
+      set -e
+      sleep 7200
+    done
+  memory: 16m
   platforms:
     cloudfoundry:
       sidecar_for: [ "web"]
