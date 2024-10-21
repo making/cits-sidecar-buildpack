@@ -31,7 +31,7 @@ processes:
       set -e
       sleep 7200
     done
-  memory: 16m
+  memory: 8m
   platforms:
     cloudfoundry:
       sidecar_for: [ "web"]
