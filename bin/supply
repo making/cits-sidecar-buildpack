@@ -13,7 +13,7 @@ echo "-----> Running sidecar supply"
 echo '---
 processes:
 - type: issue-token
-    command: |
+  command: |
     if [ -z "$CITS_URL" ]; then
       echo "Error: CITS_URL is not set" >&2
       exit 1
